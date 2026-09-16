@@ -2,11 +2,11 @@ import streamlit as st
 
 st.set_page_config(page_title="Harare Hub 🇿🇼", page_icon="🛒", layout="wide")
 st.title("Harare Hub 🇿🇼")
-st.caption("Harare #1 Marketplace | Owner: Munashe 0713504734")
-st.success("✅ Trusted Seller - Fast Delivery in Harare!")
+st.caption("Harare #1 Marketplace | Owner: Munashe 0783949268")
+st.success("✅ Trusted Seller - Fast Delivery in Harare! WhatsApp: 0783949268")
 
-search = st.text_input("🔍 Search products", "", placeholder="iPhone, Nike, TV...")
-MY_WA = "263713504734"
+search = st.text_input("🔍 Search", "", placeholder="Search phone, shoes, car...")
+MY_WA = "263783949268"
 
 products = [
     {"name": "iPhone 13 128GB", "price": "$450", "loc": "CBD", "img": "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400"},
@@ -23,10 +23,11 @@ for i, p in enumerate(products):
         with cols[i%2]:
             st.image(p["img"], use_container_width=True)
             st.markdown(f"**{p['name']}**\n\n💰 {p['price']} | 📍 {p['loc']}")
-            msg = f"Hi Munashe! I want {p['name']} for {p['price']}. Still available? Harare Hub"
-            link = f"https://wa.me/{MY_WA}?text={msg.replace(' ', '%20').replace(chr(34), '')}"
+            msg = f"Hi Munashe! I want {p['name']} for {p['price']}. Available? Harare Hub"
+            link = f"https://wa.me/{MY_WA}?text={msg.replace(' ', '%20')}"
             st.link_button(f"Buy NOW 📱", link, use_container_width=True, type="primary")
             st.divider()
 
-st.link_button("📱 Chat Owner on WhatsApp", f"https://wa.me/{MY_WA}", use_container_width=True)
-st.markdown("**EcoCash: 0713504734 | USD Cash | InnBucks**")
+st.markdown("---")
+st.markdown("**💳 EcoCash: 0783949268 | InnBucks | USD Cash**")
+st.link_button("📱 CHAT OWNER NOW - 0783949268", f"https://wa.me/{MY_WA}", use_container_width=True)
