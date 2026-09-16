@@ -1,71 +1,63 @@
 import streamlit as st
 
 st.set_page_config(page_title="Harare Hub 🇿🇼", page_icon="🛒", layout="wide")
-
-# HEADER
 st.title("Harare Hub 🇿🇼")
-st.markdown("#### Sell Anything in Harare | WhatsApp: 0783949268")
+st.caption("WhatsApp Orders: 0783949268")
 MY_WA = "263783949268"
 
-# --- SUPER EASY UPLOAD BOX ---
-st.markdown("### 📸 Add New Product")
+# --- EASY UPLOAD - FIXED ---
+st.markdown("### 📸 Add Product")
+if "myprods" not in st.session_state:
+    st.session_state.myprods = []
+
 with st.container(border=True):
-    with st.form("sell_form", clear_on_submit=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            name = st.text_input("Product Name *", placeholder="e.g. iPhone 13")
-            price = st.text_input("Price *", placeholder="e.g. $450")
-        with col2:
-            loc = st.text_input("Location", placeholder="e.g. Harare CBD")
-            photo = st.file_uploader("📷 Product Photo *", type=["jpg","png","jpeg"], help="Tap to choose from gallery")
-        
-        # BIG FRIENDLY BUTTON
-        add_btn = st.form_submit_button("🚀 ADD TO MY SHOP", type="primary", use_container_width=True)
-        
-        if add_btn:
-            if not name or not price or not photo:
-                st.error("Please fill Name, Price AND Photo")
-            else:
-                if "myprods" not in st.session_state:
-                    st.session_state.myprods = []
-                st.session_state.myprods.append({"name":name,"price":price,"loc":loc,"photo":photo})
-                st.success(f"✅ {name} added!")
-                st.balloons()
+    name = st.text_input("Product Name", placeholder="iPhone 13")
+    price = st.text_input("Price", placeholder="$450")
+    loc = st.text_input("Location", placeholder="Harare CBD")
+    photo = st.file_uploader("Choose Photo from Gallery", type=["jpg","jpeg","png"])
 
-# --- PRODUCTS GRID ---
+    if photo:
+        st.image(photo, caption="Preview", width=200)
+    
+    if st.button("🚀 ADD TO SHOP", type="primary", use_container_width=True):
+        if not photo:
+            st.error("❌ Please choose a photo first!")
+        elif not name or not price:
+            st.error("❌ Fill Name and Price!")
+        else:
+            # SAVE AS BYTES - This never fails
+            st.session_state.myprods.append({
+                "name": name,
+                "price": price,
+                "loc": loc,
+                "img_bytes": photo.getvalue()  # <-- FIX
+            })
+            st.success(f"✅ {name} added to shop!")
+            st.balloons()
+
+# --- SHOW SHOP ---
 st.divider()
-st.subheader("🛒 My Shop")
-search = st.text_input("🔍 Search products", placeholder="Type iPhone, TV...")
+st.subheader(f"My Shop ({len(st.session_state.myprods)} products)")
+search = st.text_input("🔍 Search")
 
-# Default demo products
 defaults = [
-    {"name":"iPhone 13 128GB","price":"$450","loc":"CBD","img":"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400"},
-    {"name":"Samsung TV 55\"","price":"$350","loc":"Borrowdale","img":"https://images.unsplash.com/photo-1593359677879-a4bb92f367d8?w=400"},
+    {"name":"iPhone 13 Demo","price":"$450","loc":"CBD","url":"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400"},
 ]
 
-all_items = []
-if "myprods" in st.session_state:
-    all_items.extend(st.session_state.myprods)
-all_items.extend(defaults)
-
-# Filter
-filtered = [p for p in all_items if search.lower() in p["name"].lower()]
-
-if not filtered:
-    st.info("No products found. Add your first one above! 👆")
+all_prods = st.session_state.myprods + defaults
 
 cols = st.columns(2)
-for i, p in enumerate(filtered):
-    with cols[i % 2]:
-        with st.container(border=True):
-            if "photo" in p:
-                st.image(p["photo"], use_container_width=True)
-            else:
-                st.image(p["img"], use_container_width=True)
-            st.markdown(f"**{p['name']}**")
-            st.caption(f"💰 {p['price']} | 📍 {p.get('loc','Harare')}")
-            wa_link = f"https://wa.me/{MY_WA}?text=Hi%20Munashe%2C%20I%20want%20{p['name']}%20for%20{p['price']}"
-            st.link_button("Buy on WhatsApp 📱", wa_link, use_container_width=True, type="primary")
+for i, p in enumerate(all_prods):
+    if search.lower() in p["name"].lower():
+        with cols[i%2]:
+            with st.container(border=True):
+                if "img_bytes" in p:
+                    st.image(p["img_bytes"], use_container_width=True)
+                else:
+                    st.image(p["url"], use_container_width=True)
+                st.write(f"**{p['name']}**")
+                st.caption(f"{p['price']} | {p['loc']}")
+                link = f"https://wa.me/{MY_WA}?text=Hi!%20I%20want%20{p['name']}%20{p['price']}"
+                st.link_button("Buy 📱", link, use_container_width=True)
 
-st.divider()
-st.link_button("💬 Chat Owner 0783949268", f"https://wa.me/{MY_WA}", use_container_width=True)
+st.link_button("Chat 0783949268", f"https://wa.me/{MY_WA}", use_container_width=True)
