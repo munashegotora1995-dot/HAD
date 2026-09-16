@@ -1,26 +1,24 @@
 import streamlit as st
 from datetime import datetime, timedelta
-import os
 
 st.set_page_config(page_title="Harare Small Business Hub", page_icon="📢", layout="wide")
 
-# === BLUE & GOLD PREMIUM THEME ===
+# BLUE & GOLD THEME
 st.markdown("""
 <style>
     .stApp { background-color: #0A1931; }
-    h1, h2, h3 { color: #D4AF37 !important; font-family: serif; }
-    .header-box {
-        background: linear-gradient(90deg, #0A1931 0%, #112A46 100%);
-        border: 2px solid #D4AF37;
-        border-radius: 15px;
-        padding: 20px;
+    h1, h2, h3 { color: #D4AF37 !important; }
+    .main-header {
+        background: linear-gradient(135deg, #0A1931 0%, #1A3A5F 100%);
+        border: 3px solid #D4AF37;
+        border-radius: 20px;
+        padding: 30px;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
-    .gold-text { color: #D4AF37; font-weight: bold; letter-spacing: 2px; }
-    .blue-text { color: #FFFFFF; }
-    .stTabs [data-baseweb="tab"] { color: #D4AF37; }
-    .stButton>button { background: #D4AF37; color: #0A1931; font-weight: bold; border: none; }
+    .stTabs [data-baseweb="tab"] { color: #D4AF37; font-weight: bold; }
+    .stButton>button { background: #D4AF37; color: #0A1931; font-weight: bold; }
+    div[data-testid="stContainer"] { border-color: #D4AF37 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -30,28 +28,16 @@ if "shop" not in st.session_state:
 ECOCASH = "0783949268"
 WA = "263783949268"
 
-# === HEADER WITH YOUR LOGO ===
-if os.path.exists("logo.png"):
-    c1,c2,c3 = st.columns([1,2,1])
-    with c2:
-        st.image("logo.png", use_container_width=True)
-else:
-    st.markdown("""
-    <div class="header-box">
-        <h1 style="margin:0;">HARARE</h1>
-        <h2 style="margin:0; color:#D4AF37;">SMALL BUSINESS HUB</h2>
-    </div>
-    """, unsafe_allow_html=True)
-
-# BIG WORDS HEADER - NO FLAG, BLUE & GOLD
+# ONLY ONE HEADER - BIG WORDS, BLUE & GOLD, NO FLAG, NO LOGO
 st.markdown("""
-<div class="header-box">
-    <h1 style="font-size:38px; margin:0; letter-spacing:3px;">HARARE SMALL BUSINESS HUB</h1>
-    <p style="color:#D4AF37; margin:5px;">Empowering Local Businesses • Advertise from $5</p>
+<div class="main-header">
+    <h1 style="font-size:42px; margin:0; letter-spacing:4px; color:#D4AF37;">HARARE SMALL BUSINESS HUB</h1>
+    <p style="color:#FFFFFF; font-size:16px; margin-top:10px;">Empowering Harare Businesses | Advertise from $5</p>
+    <p style="color:#D4AF37; font-size:14px;">🔵 Blue & Gold Premium Brand</p>
 </div>
 """, unsafe_allow_html=True)
 
-t_shop, t_sell, t_ads = st.tabs(["🛒 SHOP", "📦 SELL", "💰 ADVERTISE $5+"])
+t_shop, t_sell, t_ads = st.tabs(["🛒 SHOP", "📦 SELL", "💰 ADVERTISE"])
 
 with t_sell:
     with st.container(border=True):
@@ -92,12 +78,12 @@ with t_shop:
                     st.link_button("Chat Seller 📱", f"https://wa.me/263{p['phone'][-9:]}?text=Hi,%20{p['name']}", use_container_width=True, type="primary")
 
 with t_ads:
-    st.markdown("### <span style='color:#D4AF37;'>💰 Premium Advertising</span>", unsafe_allow_html=True)
-    st.success(f"EcoCash Pay: {ECOCASH}")
+    st.markdown("### <span style='color:#D4AF37;'>💰 Advertising Packages</span>", unsafe_allow_html=True)
+    st.success(f"EcoCash: {ECOCASH}")
     c1,c2,c3 = st.columns(3)
-    with c1: st.markdown("**$5**\n7 Days\nTop Listing")
-    with c2: st.markdown("**$10**\n14 Days\nStatus Boost")
-    with c3: st.markdown("**$20**\n30 Days\nVIP Banner")
+    with c1: st.info("**$5**\n7 Days")
+    with c2: st.info("**$10**\n14 Days")
+    with c3: st.info("**$20**\n30 Days")
     prod = st.selectbox("Your Product", [p["name"] for p in st.session_state.shop] if st.session_state.shop else ["Add product first"])
     plan = st.selectbox("Package", ["$5 - 7 Days","$10 - 14 Days","$20 - 30 Days"])
     proof = st.file_uploader("EcoCash Proof", type=["jpg","png","jpeg"])
@@ -111,4 +97,4 @@ with t_ads:
             st.success(f"Boosted {d} days!")
             st.link_button("Send Proof to Admin", f"https://wa.me/{WA}?text=Paid%20{plan}%20for%20{prod}", use_container_width=True)
 
-st.caption("Share: ertdr4tsrvec.streamlit.app | Support: 0783949268")
+st.caption("Harare Small Business Hub | ertdr4tsrvec.streamlit.app | Support: 0783949268")
