@@ -5,81 +5,100 @@ st.set_page_config(page_title="Harare Hub 🇿🇼", page_icon="🛒", layout="w
 if "shop" not in st.session_state:
     st.session_state.shop = []
 
-MY_ECOCASH = "0783949268"
-MY_WA = "263783949268"
+ECOCASH = "0783949268"
+WA = "263783949268"
 
-st.title("Harare Hub 🇿🇼")
-tab_shop, tab_sell, tab_ads = st.tabs(["🛒 SHOP", "📦 SELL FREE", "💰 ADVERTISE / BOOST"])
+st.title("Harare Hub 🇿🇼 | Harare's Marketplace")
+t_shop, t_sell, t_boost = st.tabs(["🛒 SHOP", "📦 SELL", "💰 ADVERTISE $5+"])
 
-with tab_sell:
-    st.subheader("Add Product - Free")
+with t_sell:
     with st.container(border=True):
+        st.subheader("Add Product - Free")
         c1,c2 = st.columns(2)
         with c1:
-            pname = st.text_input("Product Name*")
+            name = st.text_input("Product Name*")
             price = st.text_input("Price*")
-            stock = st.number_input("Stock", 1, 1000, 5)
+            stock = st.number_input("In Stock*", 1, 1000, 10)
         with c2:
-            loc = st.text_input("Location*", "CBD")
-            phone = st.text_input("Your WhatsApp*")
+            loc = st.selectbox("Location", ["CBD","Borrowdale","Avondale","Mbare","Highfields","Chitungwiza","Other"])
+            phone = st.text_input("Your WhatsApp* (078...)")
             photo = st.file_uploader("Photo*", type=["jpg","png","jpeg"])
         if st.button("PUBLISH FREE", type="primary", use_container_width=True):
-            if all([pname, price, phone, photo]):
+            if all([name][price][phone][photo]):
                 st.session_state.shop.append({
-                    "name":pname,"price":price,"stock":stock,"loc":loc,"phone":phone,
-                    "img":photo.getvalue(),"boost":False,"date":datetime.now()
+                    "name":name,"price":price,"stock":stock,"loc":loc,"phone":phone,
+                    "img":photo.getvalue(),"boost":0,"expiry":None
                 })
-                st.success("Published! Now go to ADVERTISE tab to BOOST to top!")
+                st.success("Free product published! Now BOOST it in ADVERTISE tab to get sales FAST")
                 st.balloons()
 
-with tab_shop:
-    q = st.text_input("🔍 Search what you want")
-    # Show boosted first
-    boosted = [p for p in st.session_state.shop if p.get("boost")]
-    normal = [p for p in st.session_state.shop if not p.get("boost")]
-    all_sorted = boosted + normal
+with t_shop:
+    q = st.text_input("🔍 What are you looking for?", placeholder="iPhone, TV, Shoes...")
+    # Sort: boosted first
+    def is_active(p):
+        if p.get("expiry") and datetime.now() > p["expiry"]:
+            p["boost"]=0
+            return False
+        return p.get("boost",0) > 0
 
-    cols = st.columns(2)
-    for i,p in enumerate(all_sorted):
-        if q.lower() in p["name"].lower():
-            with cols[i%2]:
-                with st.container(border=True):
-                    if p.get("boost"):
-                        st.markdown("⭐ **FEATURED - SPONSORED**")
-                    st.image(p["img"], use_container_width=True)
-                    st.write(f"**{p['name']}** - {p['price']}")
-                    st.caption(f"📦 {p['stock']} left | 📍 {p['loc']}")
-                    wa = f"https://wa.me/263{p['phone'][-9:]}?text=Hi,%20I%20want%20{p['name']}"
-                    st.link_button("Buy on WhatsApp", wa, use_container_width=True, type="primary")
+    boosted = [p for p in st.session_state.shop if is_active(p)]
+    normal = [p for p in st.session_state.shop if not is_active(p)]
+    # Sort boosted by higher package first
+    boosted = sorted(boosted, key=lambda x: x["boost"], reverse=True)
+    all_p = boosted + normal
 
-with tab_ads:
-    st.subheader("💰 Make More Sales - Advertise")
-    st.info(f"EcoCash Payment Number: {MY_ECOCASH} (Munashe)")
+    if not all_p:
+        st.info("No products yet. Be first to sell!")
+    else:
+        cols = st.columns(2)
+        for i,p in enumerate(all_p):
+            if q.lower() in p["name"].lower():
+                with cols[i%2]:
+                    with st.container(border=True):
+                        if is_active(p):
+                            days_left = (p["expiry"] - datetime.now()).days + 1
+                            st.markdown(f"⭐ **FEATURED** - {days_left} days left")
+                        st.image(p["img"], use_container_width=True)
+                        st.write(f"**{p['name']}**")
+                        st.caption(f"💰 {p['price']} | 📦 {p['stock']} left | 📍 {p['loc']}")
+                        link = f"https://wa.me/263{p['phone'][-9:]}?text=Hi,%20I%20want%20{p['name']}%20from%20Harare%20Hub"
+                        st.link_button("Chat Seller 📱", link, use_container_width=True, type="primary")
+
+with t_boost:
+    st.subheader("💰 Advertise Packages")
+    st.success(f"Pay EcoCash: {ECOCASH} - Name: Munashe")
 
     with st.container(border=True):
-        st.markdown("### 🔥 BOOST YOUR PRODUCT TO TOP")
-        st.write("**$2** = Top of Shop for 7 days. Customers see you FIRST.")
-        st.write("**$5** = Featured Banner + We post to our WhatsApp Status (5k views)")
+        c1,c2,c3 = st.columns(3)
+        with c1:
+            st.markdown("### $5 Package")
+            st.write("✅ Top of Shop\n✅ 7 Days\n✅ ⭐ Badge")
+        with c2:
+            st.markdown("### $10 Package")
+            st.write("🔥 Top + Status Post\n✅ 14 Days\n✅ Double Views")
+        with c3:
+            st.markdown("### $20 Package")
+            st.write("👑 VIP Banner\n✅ 30 Days\n✅ WhatsApp Broadcast")
 
-        prod_to_boost = st.selectbox("Which product to boost?", [p["name"] for p in st.session_state.shop] if st.session_state.shop else ["No products yet - Add in SELL tab"])
-        plan = st.radio("Choose Plan", ["$2 BOOST 7 Days", "$5 FEATURED 14 Days", "$15 Verified Shop Monthly"])
-        proof = st.file_uploader("Upload EcoCash SMS Screenshot / Payment Proof", type=["jpg","png","jpeg"])
+        st.divider()
+        prod = st.selectbox("Which product to advertise?", [p["name"] for p in st.session_state.shop] if st.session_state.shop else ["Add product in SELL tab first"])
+        plan = st.selectbox("Choose Package", ["$5 - 7 Days", "$10 - 14 Days", "$20 - 30 Days"])
+        proof = st.file_uploader("Upload EcoCash Proof Screenshot*", type=["jpg","png","jpeg"])
 
-        if st.button("✅ I HAVE PAID - ACTIVATE BOOST", use_container_width=True, type="primary"):
-            if proof:
-                # In real app, you manually verify. For now auto-boost
-                for p in st.session_state.shop:
-                    if p["name"] == prod_to_boost:
-                        p["boost"] = True
-                st.success("Payment received! Your product is now BOOSTED to top! We will verify EcoCash in 5 mins.")
-                st.link_button("Send Proof to Admin on WhatsApp", f"https://wa.me/{MY_WA}?text=Hi,%20I%20paid%20{plan}%20for%20{prod_to_boost}.%20My%20EcoCash%20is%20...", use_container_width=True)
+        if st.button("✅ I PAID - ACTIVATE NOW", type="primary", use_container_width=True):
+            if not proof or prod.startswith("Add"):
+                st.error("Upload proof & add product first")
             else:
-                st.error("Upload EcoCash proof first")
+                days = 7 if "$5" in plan else 14 if "$10" in plan else 30
+                boost_val = 1 if days==7 else 2 if days==14 else 3
+                for p in st.session_state.shop:
+                    if p["name"] == prod:
+                        p["boost"] = boost_val
+                        p["expiry"] = datetime.now() + timedelta(days=days)
+                st.success(f"✅ {prod} boosted for {days} days! Customers will see it FIRST now!")
+                st.link_button("Send Proof to Admin WhatsApp", f"https://wa.me/{WA}?text=Hi%20Admin,%20I%20paid%20{plan}%20for%20{prod}.%20EcoCash%20{prod}", use_container_width=True)
+                st.balloons()
 
-    st.divider()
-    st.markdown("#### How Business Owners Pay You:")
-    st.write(f"1. EcoCash: Dial *151*1*1*{MY_ECOCASH}*{plan.split()[0][1:]}#\n2. Screenshot SMS\n3. Upload proof here + WhatsApp us\n4. You verify on EcoCash app and tap approve")
-    st.write("**No automatic payment needed - You verify manually. Easy for Zimbabwe!**")
+    st.info("**How it works:**\n1. EcoCash $5/$10/$20 to 0783949268\n2. Upload screenshot here\n3. We verify & your product jumps to TOP automatically\n4. You get more WhatsApp orders")
 
-st.divider()
-st.caption(f"Support: {MY_ECOCASH} | Link to share: ertdr4tsrvec.streamlit.app")
+st.caption("Share app: ertdr4tsrvec.streamlit.app | Support: 0783949268")
