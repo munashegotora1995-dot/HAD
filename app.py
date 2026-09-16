@@ -2,25 +2,30 @@ import streamlit as st
 
 st.set_page_config(page_title="Harare Hub 🇿🇼", page_icon="🛒", layout="wide")
 st.title("Harare Hub 🇿🇼")
-st.caption("Harare #1 | 0783949268")
+st.caption("0783949268 - Fast Delivery")
 MY_WA = "263783949268"
 
-st.sidebar.header("📸 Add Product")
-p_name = st.sidebar.text_input("Product Name", "iPhone 13")
-p_price = st.sidebar.text_input("Price", "$450")
-p_loc = st.sidebar.text_input("Location", "Harare CBD")
-p_photo = st.sidebar.file_uploader("Upload YOUR Photo", type=["jpg","jpeg","png"])
+# --- UPLOAD AREA - MAIN PAGE NOW ---
+st.header("📸 Add Your Product")
+c1, c2 = st.columns(2)
+with c1:
+    p_name = st.text_input("Product Name", "iPhone 13")
+    p_price = st.text_input("Price", "$450")
+    p_loc = st.text_input("Location", "Harare CBD")
+with c2:
+    p_photo = st.file_uploader("Tap to Upload Photo", type=["jpg","jpeg","png"], key="up")
 
-if st.sidebar.button("Add Product +", type="primary", use_container_width=True):
-    if p_photo:
+if p_photo:
+    st.image(p_photo, width=200)
+    if st.button(f"✅ ADD {p_name} TO SHOP", type="primary", use_container_width=True):
         if "myprods" not in st.session_state:
             st.session_state.myprods = []
         st.session_state.myprods.append({"name":p_name,"price":p_price,"loc":p_loc,"photo":p_photo})
-        st.sidebar.success(f"Added {p_name}!")
-        st.rerun()
-    else:
-        st.sidebar.error("Upload photo first!")
+        st.success("ADDED! Scroll down to see it!")
+        st.balloons()
 
+# --- SHOW PRODUCTS ---
+st.divider()
 search = st.text_input("🔍 Search", "")
 
 defaults = [
@@ -41,9 +46,6 @@ for i,p in enumerate(prods):
                 st.image(p["photo"], use_container_width=True)
             else:
                 st.image(p["img"], use_container_width=True)
-            st.write(f"**{p['name']}** - {p['price']} - {p['loc']}")
-            link = f"https://wa.me/{MY_WA}?text=Hi!%20I%20want%20{p['name']}"
-            st.link_button("Buy 📱", link, use_container_width=True)
+            st.write(f"**{p['name']}** - {p['price']}")
+            st.link_button("Buy 📱", f"https://wa.me/{MY_WA}?text=Hi!%20I%20want%20{p['name']}", use_container_width=True)
             st.divider()
-
-st.link_button("Chat 0783949268", f"https://wa.me/{MY_WA}", use_container_width=True)
