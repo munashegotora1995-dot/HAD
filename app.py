@@ -2,32 +2,51 @@ import streamlit as st
 
 st.set_page_config(page_title="Harare Hub 🇿🇼", page_icon="🛒", layout="wide")
 st.title("Harare Hub 🇿🇼")
-st.caption("Harare #1 Marketplace | Owner: Munashe 0783949268")
-st.success("✅ Trusted Seller - Fast Delivery in Harare! WhatsApp: 0783949268")
-
-search = st.text_input("🔍 Search", "", placeholder="Search phone, shoes, car...")
+st.caption("Owner: Munashe | 0783949268")
 MY_WA = "263783949268"
 
-products = [
+# --- ADD YOUR PRODUCT WITH YOUR PHOTO ---
+st.sidebar.header("📸 Add Your Product")
+with st.sidebar:
+    with st.form("add"):
+        name = st.text_input("Product Name", "iPhone 13")
+        price = st.text_input("Price", "$450")
+        loc = st.text_input("Location", "Harare CBD")
+        uploaded = st.file_uploader("Upload YOUR Photo", type=["jpg","jpeg","png"])
+        add = st.form_submit_button("Add Product +")
+        if add:
+            if uploaded:
+                st.session_state.setdefault("custom", []).append({"name": name, "price": price, "loc": loc, "file": uploaded})
+                st.success(f"Added {name}!")
+            else:
+                st.warning("Please upload photo!")
+
+# --- PRODUCTS ---
+search = st.text_input("🔍 Search", "", placeholder="Search...")
+default_products = [
     {"name": "iPhone 13 128GB", "price": "$450", "loc": "CBD", "img": "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400"},
     {"name": "Nike Air Max", "price": "$85", "loc": "Avondale", "img": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"},
     {"name": "Samsung 55\" TV", "price": "$350", "loc": "Borrowdale", "img": "https://images.unsplash.com/photo-1593359677879-a4bb92f367d8?w=400"},
-    {"name": "Toyota Corolla 2015", "price": "$6500", "loc": "Harare", "img": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=400"},
-    {"name": "HP Laptop Core i5", "price": "$300", "loc": "CBD", "img": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400"},
-    {"name": "2 Room to Rent", "price": "$180/mo", "loc": "Budiriro", "img": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400"},
 ]
 
+all_products = default_products.copy()
+if "custom" in st.session_state:
+    for c in st.session_state.custom:
+        all_products.insert(0, {"name": c["name"], "price": c["price"], "loc": c["loc"], "file": c["file"]})
+
 cols = st.columns(2)
-for i, p in enumerate(products):
+for i, p in enumerate(all_products):
     if search.lower() in p["name"].lower() or search == "":
         with cols[i%2]:
-            st.image(p["img"], use_container_width=True)
+            if "file" in p:
+                st.image(p["file"], use_container_width=True)
+            else:
+                st.image(p["img"], use_container_width=True)
             st.markdown(f"**{p['name']}**\n\n💰 {p['price']} | 📍 {p['loc']}")
-            msg = f"Hi Munashe! I want {p['name']} for {p['price']}. Available? Harare Hub"
+            msg = f"Hi Munashe! I want {p['name']} for {p['price']}. Harare Hub"
             link = f"https://wa.me/{MY_WA}?text={msg.replace(' ', '%20')}"
             st.link_button(f"Buy NOW 📱", link, use_container_width=True, type="primary")
             st.divider()
 
 st.markdown("---")
-st.markdown("**💳 EcoCash: 0783949268 | InnBucks | USD Cash**")
-st.link_button("📱 CHAT OWNER NOW - 0783949268", f"https://wa.me/{MY_WA}", use_container_width=True)
+st.link_button("📱 WhatsApp 0783949268", f"https://wa.me/{MY_WA}", use_container_width=True)
